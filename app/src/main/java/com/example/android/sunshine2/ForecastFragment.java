@@ -22,17 +22,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.Iterator;
 import java.util.List;
 
 
@@ -76,7 +72,7 @@ public  class ForecastFragment extends Fragment {
 
         mLayoutManager = new LinearLayoutManager(getActivity());
 
-        mForecastList = new ArrayList<Forecast>();
+        mForecastList = new ArrayList<>();
         mAdapter = new ForecastAdapter(mForecastList);
 
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.forecast_card_list);
@@ -94,7 +90,7 @@ public  class ForecastFragment extends Fragment {
 
         private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
 
-        private List<Forecast> getWeatherDataFromJson(String forecastJsonStr, int numDays) throws JSONException {
+        private List<Forecast> getWeatherDataFromJson(String forecastJsonStr) throws JSONException {
 
             // These are the names of the JSON objects that need to be extracted.
             final String OWM_LIST = "list";
@@ -177,12 +173,11 @@ public  class ForecastFragment extends Fragment {
         protected List<Forecast> doInBackground(String... params) {
 
             // These two need to be declared outside the try/catch
-// so that they can be closed in the finally block.
+            // so that they can be closed in the finally block.
             HttpURLConnection urlConnection = null;
-            BufferedReader reader = null;
 
-// Will contain the raw JSON response as a string.
-            String forecastJsonStr = null;
+            // Will contain the raw JSON response as a string.
+            String forecastJsonStr;
             String format = "json";
             String units = "metric";
             int numDays = 7;
@@ -209,19 +204,10 @@ public  class ForecastFragment extends Fragment {
 
                 // Read the input stream into a String
                 InputStream inputStream = urlConnection.getInputStream();
-                StringBuffer buffer = new StringBuffer();
+                StringBuilder buffer = new StringBuilder();
                 if (inputStream == null) {
                     // Nothing to do.
                     return null;
-                }
-                reader = new BufferedReader(new InputStreamReader(inputStream));
-
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
-                    // But it does make debugging a *lot* easier if you print out the completed
-                    // buffer for debugging.
-                    buffer.append(line + "\n");
                 }
 
                 if (buffer.length() == 0) {
@@ -230,7 +216,7 @@ public  class ForecastFragment extends Fragment {
                 }
                 forecastJsonStr = buffer.toString();
 
-                return getWeatherDataFromJson(forecastJsonStr, numDays);
+                return getWeatherDataFromJson(forecastJsonStr);
             } catch (IOException e) {
                 Log.e(LOG_TAG, "Error ", e);
                 // If the code didn't successfully get the weather data, there's no point in attempting
@@ -242,13 +228,6 @@ public  class ForecastFragment extends Fragment {
             } finally{
                 if (urlConnection != null) {
                     urlConnection.disconnect();
-                }
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (final IOException e) {
-                        Log.e(LOG_TAG, "Error closing stream", e);
-                    }
                 }
             }
         }
