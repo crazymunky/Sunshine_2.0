@@ -8,8 +8,10 @@ import android.widget.TextView;
 
 import com.example.android.sunshine2.classes.Forecast;
 
+import java.util.List;
+
 public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ViewHolder> {
-    private Forecast[] mDataForecasts;
+    private List<Forecast> mDataForecasts;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView mForecastText;
@@ -19,7 +21,7 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ViewHo
         }
     }
 
-    public ForecastAdapter(Forecast[] forecasts) {
+    public ForecastAdapter(List<Forecast> forecasts) {
         mDataForecasts = forecasts;
     }
 
@@ -35,13 +37,14 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.mForecastText.setText(mDataForecasts[position].getText());
-
+        Forecast forecast = mDataForecasts.get(position);
+        if(forecast!=null)
+            holder.mForecastText.setText(mDataForecasts.get(position).toString());
     }
 
 
     @Override
     public int getItemCount() {
-        return mDataForecasts.length;
+        return mDataForecasts.size();
     }
 }
